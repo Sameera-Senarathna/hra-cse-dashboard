@@ -1,0 +1,44 @@
+.app-container {
+    display: flex;
+}
+
+.app-side-menu {
+    background-color: #023047;
+    width: 80px;
+    height: 100vh;
+}
+
+.app-content {
+    width: 100%;
+}
+
+.crud-section {
+    background-color: lightgray;
+    min-height: 100vh;
+}
+
+.analytic-section {
+    background-color: #8ECAE6;
+    min-height: 100vh;
+}
+
+.section-header {
+    padding-left: 8px;
+    height: 60px;
+    /*background-color: #023047;*/
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.search-input-form {
+    padding: 8px 12px;
+    background: white;
+}
+
+.show-date-section {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: white;
+}
