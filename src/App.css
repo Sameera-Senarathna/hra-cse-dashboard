@@ -42,3 +42,20 @@
     padding: 8px 12px;
     background: white;
 }
+
+.menu-item {
+    margin: 8px;
+    background: #8ECAE6;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-item:hover {
+    cursor: pointer;
+    font-size: 60px;
+    -webkit-box-shadow: 0px 0px 4px 0px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 4px 0px rgba(255,255,255,1);
+    box-shadow: 0px 0px 4px 0px rgba(255,255,255,1);
+}

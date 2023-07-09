@@ -4,6 +4,8 @@ import {Button, Checkbox, Col, Form, Input, Modal, Radio, Row, Select, Table} fr
 import TelcoResourceModel from "./telco-resource.model";
 import {ColumnsType} from "antd/es/table";
 
+import {HomeOutlined, PlaySquareOutlined, SettingOutlined, DatabaseOutlined} from '@ant-design/icons';
+
 function App() {
 
     const [createNewModelData, setCreateNewModelData] = useState<{
@@ -195,7 +197,20 @@ function App() {
     return (
         <>
             <div className="app-container">
-                <div className="app-side-menu"></div>
+                <div className="app-side-menu">
+                    <div className="menu-item">
+                        <HomeOutlined style={{fontSize: 36}}/>
+                    </div>
+                    <div className="menu-item">
+                        <PlaySquareOutlined style={{fontSize: 36}}/>
+                    </div>
+                    <div className="menu-item">
+                        <DatabaseOutlined style={{fontSize: 36}}/>
+                    </div>
+                    <div className="menu-item">
+                        <SettingOutlined style={{fontSize: 36}}/>
+                    </div>
+                </div>
                 <div className="app-content">
                     <Row>
                         <Col span={16} className="crud-section">
@@ -355,8 +370,8 @@ function App() {
                 <p style={{fontSize: 16}}>Are you sure you want to delete this resource?</p>
                 <p style={{marginTop: 8}}>
                     <span style={{fontWeight: 500}}>ID: </span>
-                        {deleteModelData.selectedResource?.id}
-                    </p>
+                    {deleteModelData.selectedResource?.id}
+                </p>
                 <p>
                     <span style={{fontWeight: 500}}>Telecom Product: </span>
                     {deleteModelData.selectedResource?.telecomProduct}
