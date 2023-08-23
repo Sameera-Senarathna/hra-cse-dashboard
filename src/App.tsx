@@ -1,12 +1,25 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
-import {Button, Checkbox, Col, Form, Input, Modal, Radio, Row, Select, Table} from "antd";
+import {Button, Checkbox, Col, Form, Input, Modal, Radio, Row, Select, Table, TablePaginationConfig} from "antd";
 import TelcoResourceModel from "./telco-resource.model";
 import {ColumnsType} from "antd/es/table";
 
 import {HomeOutlined, PlaySquareOutlined, SettingOutlined, DatabaseOutlined} from '@ant-design/icons';
+import ResourcesListModel, {Content} from "./models/resources-list.model";
+import axiosInstance from "./services/axios.services";
+import backendEndpointConstants from "./constants/backend-endpoint.constants";
+import {getAllTelcoResources, getTelcoResourceById} from "./services/api-calls.service";
 
 function App() {
+
+    const [resourceList, setResourceList] = useState<ResourcesListModel>();
+    const [paginationData, setPaginationData] = useState<{
+        currentPage: number,
+        itemPerPage: number,
+    }>({
+        currentPage: 1,
+        itemPerPage: 10
+    });
 
     const [createNewModelData, setCreateNewModelData] = useState<{
         isOpen: boolean;
@@ -24,102 +37,33 @@ function App() {
     }>({
         isOpen: false,
         selectedResource: null
-    })
+    });
 
-    const dataSource = [
-        {
-            "id": 1,
-            "createdDate": "2023-07-02T21:22:55",
-            "modifiedDate": "2023-07-02T21:22:55",
-            "telecomProduct": "string",
-            "timeSchemaId": 0,
-            "category": "string",
-            "priority": 0
-        },
-        {
-            "id": 2,
-            "createdDate": "2023-07-02T21:15:27",
-            "modifiedDate": "2023-07-02T21:17:49",
-            "telecomProduct": "string888888",
-            "timeSchemaId": 0,
-            "category": "string",
-            "priority": 0
-        },
-        {
-            "id": 3,
-            "createdDate": "2023-07-02T19:51:56",
-            "modifiedDate": "2023-07-02T19:51:56",
-            "telecomProduct": "DTV_PPS",
-            "timeSchemaId": 1,
-            "category": "DTV",
-            "priority": 2
-        },
-        {
-            "id": 4,
-            "createdDate": "2023-07-02T21:22:55",
-            "modifiedDate": "2023-07-02T21:22:55",
-            "telecomProduct": "string",
-            "timeSchemaId": 0,
-            "category": "string",
-            "priority": 0
-        },
-        {
-            "id": 5,
-            "createdDate": "2023-07-02T21:15:27",
-            "modifiedDate": "2023-07-02T21:17:49",
-            "telecomProduct": "string888888",
-            "timeSchemaId": 0,
-            "category": "string",
-            "priority": 0
-        },
-        {
-            "id": 6,
-            "createdDate": "2023-07-02T19:51:56",
-            "modifiedDate": "2023-07-02T19:51:56",
-            "telecomProduct": "DTV_PPS",
-            "timeSchemaId": 1,
-            "category": "DTV",
-            "priority": 2
-        },
-        {
-            "id": 7,
-            "createdDate": "2023-07-02T21:22:55",
-            "modifiedDate": "2023-07-02T21:22:55",
-            "telecomProduct": "string",
-            "timeSchemaId": 0,
-            "category": "string",
-            "priority": 0
-        },
-        {
-            "id": 8,
-            "createdDate": "2023-07-02T21:15:27",
-            "modifiedDate": "2023-07-02T21:17:49",
-            "telecomProduct": "string888888",
-            "timeSchemaId": 0,
-            "category": "string",
-            "priority": 0
-        },
-        {
-            "id": 9,
-            "createdDate": "2023-07-02T19:51:56",
-            "modifiedDate": "2023-07-02T19:51:56",
-            "telecomProduct": "DTV_PPS",
-            "timeSchemaId": 1,
-            "category": "DTV",
-            "priority": 2
-        },
-        {
-            "id": 10,
-            "createdDate": "2023-07-02T19:51:56",
-            "modifiedDate": "2023-07-02T19:51:56",
-            "telecomProduct": "DTV_PPS",
-            "timeSchemaId": 1,
-            "category": "DTV",
-            "priority": 2
+    const clickSearchButton = async (formInputs: any) => {
+        if(!formInputs.id) {
+            const apiResponse = await getAllTelcoResources(1, paginationData.itemPerPage);
+            setPaginationData((prevState) => {
+                return {...prevState, currentPage: 1}
+            })
+            setResourceList(apiResponse);
+        } else {
+            const apiResponse = await getTelcoResourceById(formInputs.id);
+            setPaginationData((prevState) => {
+                return {currentPage: 1, itemPerPage: 10}
+            })
+            setResourceList(apiResponse);
         }
-    ];
+    }
 
-    const columns: ColumnsType<TelcoResourceModel> = [
+    const tableOnChange = (nextPageDetails: TablePaginationConfig) => {
+        const newCurrentPage = (nextPageDetails.pageSize === paginationData.itemPerPage) ? nextPageDetails.current! : 1;
+        setPaginationData({currentPage: newCurrentPage, itemPerPage: nextPageDetails.pageSize!})
+        getAllTelcoResources(newCurrentPage, nextPageDetails.pageSize!).then((apiResponse) => {
+            setResourceList(apiResponse);
+        })
+    }
+
+    const columns: ColumnsType<Content> = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -221,15 +165,20 @@ function App() {
                                     </Col>
                                     <Col span="24" className="search-input-form">
                                         <Form
-                                            // form={form}
                                             style={{justifyContent: "end"}}
                                             layout="inline"
+                                            onFinish={clickSearchButton}
                                         >
                                             <Form.Item label="ID" name="id">
                                                 <Input placeholder="Resource ID"/>
                                             </Form.Item>
                                             <Form.Item style={{marginInlineEnd: 8}}>
-                                                <Button type="default">Search</Button>
+                                                <Button
+                                                    type="default"
+                                                    htmlType="submit"
+                                                >
+                                                    Search
+                                                </Button>
                                             </Form.Item>
                                             <Form.Item style={{marginInlineEnd: 0}}>
                                                 <Button
@@ -248,13 +197,17 @@ function App() {
                                     <Col span="24" className="show-date-section">
                                         <Table
                                             size="small"
-                                            dataSource={dataSource}
+                                            dataSource={resourceList?.content}
                                             columns={columns}
+                                            onChange={tableOnChange}
                                             pagination={{
-                                                showSizeChanger: true,
-                                                pageSizeOptions: [5, 25, 50],
-                                                defaultPageSize: 5,
-                                                size: "default"
+                                                showSizeChanger: resourceList && resourceList.numberOfElements > 1,
+                                                pageSizeOptions: [10, 25, 50],
+                                                defaultPageSize: 10,
+                                                size: "default",
+                                                total: resourceList?.numberOfElements,
+                                                pageSize: paginationData.itemPerPage,
+                                                current: paginationData.currentPage
                                             }}
                                         />
                                     </Col>
@@ -272,6 +225,7 @@ function App() {
                     </Row>
                 </div>
             </div>
+
             <Modal
                 title={createNewModelData.operation === "NEW" ? "Create New Telco Resource" : "Update Telco Resource"}
                 open={createNewModelData.isOpen}
@@ -385,6 +339,8 @@ function App() {
                     {deleteModelData.selectedResource?.priority}
                 </p>
             </Modal>
+
+
         </>
     );
 }
