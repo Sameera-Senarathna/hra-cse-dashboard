@@ -1,0 +1,133 @@
+POST: for (Create With = default)
+http://localhost:8080/telcoproductcatalog/createtelcoresource
+{
+  "category": "string",
+  "createdDate": "2023-07-02T14:21:46.145Z",
+  "modifiedDate": "2023-07-02T14:21:46.145Z",
+  "priority": 0,
+  "telecomProduct": "string",
+  "id": 2,
+  "timeSchemaId": 0
+}
+Response: 201 (Created)
+
+
+DELETE:
+http://localhost:8080/telcoproductcatalog/deletetelcoresource/7
+Response: 204 (No Content)
+
+
+UPDATE:
+http://localhost:8080/telcoproductcatalog/updatetelcoresource/8
+{
+  "category": "string",
+  "createdDate": "2023-07-02T15:45:17.239Z",
+  "modifiedDate": "2023-07-02T15:45:17.239Z",
+  "priority": 0,
+  "id":8,
+  "telecomProduct": "string888888",
+  "timeSchemaId": 0
+}
+
+
+CREATE with Caching (Check-Box) enabled:
+http://localhost:8080/telcoproductcatalog/writethroughtelcoresource
+{
+  "category": "string",
+  "createdDate": "2023-07-02T15:52:45.539Z",
+  "id": 1,
+  "modifiedDate": "2023-07-02T15:52:45.539Z",
+  "priority": 0,
+  "telecomProduct": "string",
+  "timeSchemaId": 0
+}
+Response: 201 (Created)
+
+
+CREATE with WriteBack Function (Check-Box) enbaled:
+http://localhost:8080/telcoproductcatalog/writebacktelcoresource?buffer-size=3
+{
+  "category": "string",
+  "createdDate": "2023-07-02T15:49:42.904Z",
+  "id": 3,
+  "modifiedDate": "2023-07-02T15:49:42.904Z",
+  "priority": 0,
+  "telecomProduct": "string",
+  "timeSchemaId": 0
+}
+Response: 201 (Created)
+
+
+GET ALL:
+http://localhost:8080/telcoproductcatalog/gettelcoresources?page=0&size=10
+Response: 200
+{
+  "content": [  // Need to get How this Resource was created. WriteBack|Cached
+    {
+      "id": 9,
+      "createdDate": "2023-07-02T21:22:55",
+      "modifiedDate": "2023-07-02T21:22:55", 
+      "telecomProduct": "string",
+      "timeSchemaId": 0,
+      "category": "string",
+      "priority": 0
+    },
+    {
+      "id": 8,
+      "createdDate": "2023-07-02T21:15:27",
+      "modifiedDate": "2023-07-02T21:17:49",
+      "telecomProduct": "string888888",
+      "timeSchemaId": 0,
+      "category": "string",
+      "priority": 0
+    },
+    {
+      "id": 1,
+      "createdDate": "2023-07-02T19:51:56",
+      "modifiedDate": "2023-07-02T19:51:56",
+      "telecomProduct": "DTV_PPS",
+      "timeSchemaId": 1,
+      "category": "DTV",
+      "priority": 2
+    }
+  ],
+  "pageable": {
+    "sort": {
+      "sorted": true,
+      "unsorted": false,
+      "empty": false
+    },
+    "offset": 0,
+    "pageNumber": 0,
+    "pageSize": 10,
+    "unpaged": false,
+    "paged": true
+  },
+  "totalElements": 3,
+  "last": true,
+  "totalPages": 1,
+  "size": 10,
+  "number": 0,
+  "sort": {
+    "sorted": true,
+    "unsorted": false,
+    "empty": false
+  },
+  "numberOfElements": 3,
+  "first": true,
+  "empty": false
+}
+
+
+GET by Id:
+http://localhost:8080/telcoproductcatalog/readthroughtelcoresource/1
+Response: 200
+{
+  "id": 1,
+  "createdDate": "2023-07-02T19:51:56",
+  "modifiedDate": "2023-07-02T19:51:56",
+  "telecomProduct": "DTV_PPS",
+  "timeSchemaId": 1,
+  "category": "DTV",
+  "priority": 2
+}
