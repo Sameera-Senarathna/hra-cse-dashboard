@@ -1,16 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
-import {Button, Checkbox, Col, Form, Input, Modal, Radio, Row, Select, Table, TablePaginationConfig} from "antd";
+import {Button, Col, Form, Input, Modal, Radio, Row, Select, Spin, Table, TablePaginationConfig} from "antd";
 import TelcoResourceModel from "./telco-resource.model";
 import {ColumnsType} from "antd/es/table";
 
-import {HomeOutlined, PlaySquareOutlined, SettingOutlined, DatabaseOutlined} from '@ant-design/icons';
+import {DatabaseOutlined, HomeOutlined, PlaySquareOutlined, SettingOutlined} from '@ant-design/icons';
 import ResourcesListModel, {Content} from "./models/resources-list.model";
-import axiosInstance from "./services/axios.services";
-import backendEndpointConstants from "./constants/backend-endpoint.constants";
-import {getAllTelcoResources, getTelcoResourceById} from "./services/api-calls.service";
+import {
+    createResource,
+    deleteResource,
+    getAllTelcoResources,
+    getTelcoResourceById,
+    updateResource
+} from "./services/api-calls.service";
+import {useWatch} from "antd/es/form/Form";
+import showNotification from "./services/notification.service";
 
 function App() {
+
+    const [form] = Form.useForm();
+    const createdWithValue = useWatch("createWith", form);
 
     const [resourceList, setResourceList] = useState<ResourcesListModel>();
     const [paginationData, setPaginationData] = useState<{
@@ -40,7 +49,7 @@ function App() {
     });
 
     const clickSearchButton = async (formInputs: any) => {
-        if(!formInputs.id) {
+        if (!formInputs?.id) {
             const apiResponse = await getAllTelcoResources(1, paginationData.itemPerPage);
             setPaginationData((prevState) => {
                 return {...prevState, currentPage: 1}
@@ -61,6 +70,59 @@ function App() {
         getAllTelcoResources(newCurrentPage, nextPageDetails.pageSize!).then((apiResponse) => {
             setResourceList(apiResponse);
         })
+    }
+
+    const deleteResourceConfirmationHandler = async () => {
+        try {
+            await deleteResource(deleteModelData.selectedResource!.id);
+            setDeleteModelData({isOpen: false, selectedResource: null});
+            showNotification("success", "Resource Deleted Successfully");
+        } catch (error) {
+
+        }
+    }
+
+    const submitCreateOrEditForm = async () => {
+
+        try {
+            const formValue = await form.validateFields();
+
+            if (createNewModelData.operation === "NEW") {
+
+                await createResource(
+                    {
+                        category: formValue.category,
+                        priority: formValue.priority,
+                        telecomProduct: formValue.telecomProduct,
+                        timeSchemaId: formValue.timeSchemaId
+                    },
+                    formValue.createWith,
+                    formValue.bufferSize
+                )
+                showNotification("success", "Resource Created Successfully");
+
+            } else if (createNewModelData.operation === "EDIT") {
+                await updateResource(
+                    {
+                        category: formValue.category,
+                        priority: formValue.priority,
+                        telecomProduct: formValue.telecomProduct,
+                        timeSchemaId: formValue.timeSchemaId
+                    },
+                    createNewModelData.selectedResource!.id
+                )
+                showNotification("success", "Resource Updated Successfully");
+            }
+
+            await clickSearchButton(undefined);
+            setCreateNewModelData({isOpen: false, operation: "NONE", selectedResource: null});
+            form.resetFields();
+
+        } catch (error) {
+
+        }
+
+
     }
 
     const columns: ColumnsType<Content> = [
@@ -111,11 +173,17 @@ function App() {
                             size={"small"}
                             style={{marginRight: 8}}
                             onClick={() => {
+                                form.setFieldsValue({
+                                    category: record.category,
+                                    priority: record.priority,
+                                    telecomProduct: record.telecomProduct,
+                                    timeSchemaId: record.timeSchemaId
+                                })
                                 setCreateNewModelData({
                                     isOpen: true,
                                     operation: "EDIT",
                                     selectedResource: record
-                                })
+                                });
                             }}
                         >
                             Update
@@ -140,6 +208,7 @@ function App() {
 
     return (
         <>
+
             <div className="app-container">
                 <div className="app-side-menu">
                     <div className="menu-item">
@@ -209,6 +278,7 @@ function App() {
                                                 pageSize: paginationData.itemPerPage,
                                                 current: paginationData.currentPage
                                             }}
+                                            key="id"
                                         />
                                     </Col>
                                 </Row>
@@ -229,18 +299,18 @@ function App() {
             <Modal
                 title={createNewModelData.operation === "NEW" ? "Create New Telco Resource" : "Update Telco Resource"}
                 open={createNewModelData.isOpen}
-                onOk={() => {
-                    setCreateNewModelData({isOpen: false, operation: "NONE", selectedResource: null})
-                }}
+                onOk={submitCreateOrEditForm}
                 onCancel={() => {
+                    form.resetFields();
                     setCreateNewModelData({isOpen: false, operation: "NONE", selectedResource: null})
                 }}
-                okText="Create"
+                okText={createNewModelData.operation === "NEW" ? "Create" : "Update"}
                 width={550}
                 maskClosable={false}
                 destroyOnClose={true}
             >
                 <Form
+                    form={form}
                     name="createForm"
                     autoComplete="off"
                     style={{marginTop: 20}}
@@ -255,12 +325,9 @@ function App() {
                         createNewModelData.operation === "EDIT" && (
                             <>
                                 <Form.Item label="ID">{createNewModelData.selectedResource?.id}</Form.Item>
-                                <Form.Item
-                                    label="Time Schema ID">{createNewModelData.selectedResource?.timeSchemaId}</Form.Item>
-                                <Form.Item
-                                    label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
-                                <Form.Item
-                                    label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item label="Time Schema ID">{createNewModelData.selectedResource?.timeSchemaId}</Form.Item>
+                                <Form.Item label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
                             </>
                         )
                     }
@@ -289,30 +356,49 @@ function App() {
                         </Select>
                     </Form.Item>
 
-                    {/*<Form.Item name="isCreateWithCaching" label="Create With Caching">*/}
-                    {/*    <Checkbox/>*/}
-                    {/*</Form.Item>*/}
-
-                    {/*<Form.Item name="isCreateWithWriteBack" label="Create With Write Back">*/}
-                    {/*    <Checkbox/>*/}
-                    {/*</Form.Item>*/}
-
-                    <Form.Item name="createWith" label="Create With" rules={[{required: true}]}>
-                        <Radio.Group>
-                            <Radio value="CACHING">Caching</Radio>
-                            <Radio value="WRITE_BACK">Write Back</Radio>
-                            <Radio value="DEFAULT">Default</Radio>
-                        </Radio.Group>
+                    <Form.Item name="timeSchemaId" label="Time Schema ID" rules={[{required: true}]}>
+                        <Input
+                            onKeyPress={(event) => {
+                                if (!/[0-9]/.test(event.key)) {
+                                    event.preventDefault();
+                                }
+                            }}/>
                     </Form.Item>
+
+                    {
+                        createNewModelData.operation === "NEW" && (
+                            <Form.Item name="createWith" label="Create With" rules={[{required: true}]}>
+                                <Radio.Group>
+                                    <Radio value="CACHING">Caching</Radio>
+                                    <Radio value="WRITE_BACK">Write Back</Radio>
+                                    <Radio value="DEFAULT">Default</Radio>
+                                </Radio.Group>
+                            </Form.Item>
+                        )
+                    }
+
+
+
+                    {
+                        createdWithValue === "WRITE_BACK" &&
+                        <Form.Item name="bufferSize" label="Buffer Size" rules={[{required: true}]}>
+                            <Input
+                                onKeyPress={(event) => {
+                                    if (!/[0-9]/.test(event.key)) {
+                                        event.preventDefault();
+                                    }
+                                }}/>
+                        </Form.Item>
+                    }
 
                 </Form>
             </Modal>
+
+
             <Modal
                 title="Delete Resource"
                 open={deleteModelData.isOpen}
-                onOk={() => {
-                    setDeleteModelData({isOpen: false, selectedResource: null})
-                }}
+                onOk={deleteResourceConfirmationHandler}
                 onCancel={() => {
                     setDeleteModelData({isOpen: false, selectedResource: null})
                 }}
@@ -339,7 +425,6 @@ function App() {
                     {deleteModelData.selectedResource?.priority}
                 </p>
             </Modal>
-
 
         </>
     );
