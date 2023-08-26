@@ -6,6 +6,7 @@ const BackendEndpointConstants = {
     WRITEBACK_CREATE_RESOURCE: "/telcoproductcatalog/writebacktelcoresource",
     UPDATE_RESOURCE: "/telcoproductcatalog/updatetelcoresource",
     DELETE_RESOURCE: "/telcoproductcatalog/deletetelcoresource",
+    META_DATA: "/telcoproductcatalog/getmetadata",
 }
 
 export default  BackendEndpointConstants

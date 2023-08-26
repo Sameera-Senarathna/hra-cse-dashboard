@@ -1,6 +1,7 @@
 import axiosInstance from "./axios.services";
 import ResourcesListModel, {Content} from "../models/resources-list.model";
 import backendEndpointConstants from "../constants/backend-endpoint.constants";
+import MetaDateModel from "../models/meta-date.model";
 
 export const getAllTelcoResources = async (page: number, size: number): Promise<ResourcesListModel> => {
     const apiResponse = await axiosInstance.get<ResourcesListModel>(
@@ -94,5 +95,22 @@ export const deleteResource = async (
     )
 
     return "OPERATION SUCCESS";
+
+}
+
+export const getMetaData = async (
+    recodeLimit?: string
+): Promise<MetaDateModel[]> => {
+
+    const apiResponse = await axiosInstance.get<MetaDateModel[]>(
+        backendEndpointConstants.META_DATA,
+        {
+            params: {
+                "record-limit": recodeLimit ?? "2"
+            }
+        }
+    )
+
+    return apiResponse.data;
 
 }

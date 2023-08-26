@@ -9,7 +9,7 @@ import ResourcesListModel, {Content} from "./models/resources-list.model";
 import {
     createResource,
     deleteResource,
-    getAllTelcoResources,
+    getAllTelcoResources, getMetaData,
     getTelcoResourceById,
     updateResource
 } from "./services/api-calls.service";
@@ -17,13 +17,17 @@ import {useWatch} from "antd/es/form/Form";
 import showNotification from "./services/notification.service";
 import CategoryConstants from "./constants/Category.Constants";
 import PriorityConstants from "./constants/Priority.constants";
+import MetaDateModel from "./models/meta-date.model";
+import notificationService from "./services/notification.service";
 
 function App() {
 
     const [form] = Form.useForm();
     const createdWithValue = useWatch("createWith", form);
+    const [metaDataRecodeLimit, setMetaDataRecodeLimit] = useState("10")
 
     const [resourceList, setResourceList] = useState<ResourcesListModel>();
+    const [metaDataList, setMetaDataList] = useState<MetaDateModel[]>([]);
     const [paginationData, setPaginationData] = useState<{
         currentPage: number,
         itemPerPage: number,
@@ -55,27 +59,40 @@ function App() {
     }, [])
 
     const clickSearchButton = async (formInputs: any) => {
-        if (!formInputs?.id) {
-            const apiResponse = await getAllTelcoResources(1, paginationData.itemPerPage);
-            setPaginationData((prevState) => {
-                return {...prevState, currentPage: 1}
-            })
-            setResourceList(apiResponse);
-        } else {
-            const apiResponse = await getTelcoResourceById(formInputs.id);
-            setPaginationData((prevState) => {
-                return {currentPage: 1, itemPerPage: 10}
-            })
-            setResourceList(apiResponse);
+        try {
+            if (!formInputs?.id) {
+                const apiResponse = await getAllTelcoResources(1, paginationData.itemPerPage);
+                const metaDataResponse = await getMetaData(metaDataRecodeLimit);
+                setPaginationData((prevState) => {
+                    return {...prevState, currentPage: 1}
+                })
+                setResourceList(apiResponse);
+                setMetaDataList(metaDataResponse);
+            } else {
+                const apiResponse = await getTelcoResourceById(formInputs.id);
+                const metaDataResponse = await getMetaData(metaDataRecodeLimit);
+                setPaginationData((prevState) => {
+                    return {currentPage: 1, itemPerPage: 10}
+                })
+                setResourceList(apiResponse);
+                setMetaDataList(metaDataResponse);
+            }
+        } catch (error) {
+            notificationService("error", "API Error!!!");
         }
     }
 
-    const tableOnChange = (nextPageDetails: TablePaginationConfig) => {
-        const newCurrentPage = (nextPageDetails.pageSize === paginationData.itemPerPage) ? nextPageDetails.current! : 1;
-        setPaginationData({currentPage: newCurrentPage, itemPerPage: nextPageDetails.pageSize!})
-        getAllTelcoResources(newCurrentPage, nextPageDetails.pageSize!).then((apiResponse) => {
+    const tableOnChange = async (nextPageDetails: TablePaginationConfig) => {
+        try {
+            const newCurrentPage = (nextPageDetails.pageSize === paginationData.itemPerPage) ? nextPageDetails.current! : 1;
+            setPaginationData({currentPage: newCurrentPage, itemPerPage: nextPageDetails.pageSize!});
+            const apiResponse = await getAllTelcoResources(newCurrentPage, nextPageDetails.pageSize!);
+            const metaDataResponse = await getMetaData(metaDataRecodeLimit);
             setResourceList(apiResponse);
-        })
+            setMetaDataList(metaDataResponse);
+        } catch (error) {
+            notificationService("error", "API Error!!!");
+        }
     }
 
     const deleteResourceConfirmationHandler = async () => {
@@ -213,24 +230,51 @@ function App() {
         }
     ];
 
+    const metaDataTableColumns: ColumnsType<MetaDateModel> = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+        },
+        {
+            title: 'Request Type',
+            dataIndex: 'requestType',
+        },
+        {
+            title: 'Request Status',
+            dataIndex: 'requestStatus',
+        },
+        {
+            title: 'Date Time',
+            dataIndex: 'dateTime',
+        },
+        {
+            title: 'Hit Rate',
+            dataIndex: 'hitRate',
+        },
+        {
+            title: 'Delay',
+            dataIndex: 'delay',
+        },
+    ]
+
     return (
         <>
 
             <div className="app-container">
-                <div className="app-side-menu">
-                    <div className="menu-item">
-                        <HomeOutlined style={{fontSize: 36}}/>
-                    </div>
-                    <div className="menu-item">
-                        <PlaySquareOutlined style={{fontSize: 36}}/>
-                    </div>
-                    <div className="menu-item">
-                        <DatabaseOutlined style={{fontSize: 36}}/>
-                    </div>
-                    <div className="menu-item">
-                        <SettingOutlined style={{fontSize: 36}}/>
-                    </div>
-                </div>
+                {/*<div className="app-side-menu">*/}
+                {/*    <div className="menu-item">*/}
+                {/*        <HomeOutlined style={{fontSize: 36}}/>*/}
+                {/*    </div>*/}
+                {/*    <div className="menu-item">*/}
+                {/*        <PlaySquareOutlined style={{fontSize: 36}}/>*/}
+                {/*    </div>*/}
+                {/*    <div className="menu-item">*/}
+                {/*        <DatabaseOutlined style={{fontSize: 36}}/>*/}
+                {/*    </div>*/}
+                {/*    <div className="menu-item">*/}
+                {/*        <SettingOutlined style={{fontSize: 36}}/>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
                 <div className="app-content">
                     <Row>
                         <Col span={16} className="crud-section">
@@ -280,7 +324,7 @@ function App() {
                                                 showSizeChanger: resourceList && resourceList.totalElements! > 1,
                                                 pageSizeOptions: [10, 25, 50],
                                                 defaultPageSize: 10,
-                                                size: "default",
+                                                size: "small",
                                                 total: resourceList?.totalElements,
                                                 pageSize: paginationData.itemPerPage,
                                                 current: paginationData.currentPage
@@ -289,6 +333,27 @@ function App() {
                                         />
                                     </Col>
                                 </Row>
+                            </div>
+                            <div style={{paddingLeft: 12, paddingRight: 12}}>
+                                <Col span="24" className="section-header">
+                                    Metadata Section
+                                    <div>
+                                        <Input
+                                            defaultValue={10}
+                                            style={{width: 40}}
+                                            onChange={(event) => setMetaDataRecodeLimit(event.target.value)}/>
+                                    </div>
+
+                                </Col>
+
+                                <Col span="24" className="show-date-section">
+                                    <Table
+                                        size="small"
+                                        dataSource={metaDataList}
+                                        columns={metaDataTableColumns}
+                                        key="id"
+                                    />
+                                </Col>
                             </div>
                         </Col>
                         <Col span={8} className="analytic-section">
@@ -333,8 +398,10 @@ function App() {
                             <>
                                 <Form.Item label="ID">{createNewModelData.selectedResource?.id}</Form.Item>
                                 <Form.Item label="Rating">{createNewModelData.selectedResource?.timeSchemaId}</Form.Item>
-                                <Form.Item label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
-                                <Form.Item label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item
+                                    label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item
+                                    label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
                             </>
                         )
                     }
@@ -351,7 +418,8 @@ function App() {
                         <Select placeholder="Select Telecom Product Category">
                             {
                                 CategoryConstants.map((singleCategory) => {
-                                    return <Select.Option key={singleCategory} value={singleCategory}>{singleCategory}</Select.Option>
+                                    return <Select.Option key={singleCategory}
+                                                          value={singleCategory}>{singleCategory}</Select.Option>
                                 })
                             }
                         </Select>
@@ -361,7 +429,8 @@ function App() {
                         <Select placeholder="Select Telecom Product Priority">
                             {
                                 PriorityConstants.map((singlePriority) => {
-                                    return <Select.Option key={singlePriority} value={singlePriority}>{singlePriority}</Select.Option>
+                                    return <Select.Option key={singlePriority}
+                                                          value={singlePriority}>{singlePriority}</Select.Option>
                                 })
                             }
                         </Select>
@@ -387,7 +456,6 @@ function App() {
                             </Form.Item>
                         )
                     }
-
 
 
                     {
