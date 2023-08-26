@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {Button, Col, Form, Input, Modal, Radio, Row, Select, Spin, Table, TablePaginationConfig} from "antd";
 import TelcoResourceModel from "./telco-resource.model";
@@ -15,6 +15,8 @@ import {
 } from "./services/api-calls.service";
 import {useWatch} from "antd/es/form/Form";
 import showNotification from "./services/notification.service";
+import CategoryConstants from "./constants/Category.Constants";
+import PriorityConstants from "./constants/Priority.constants";
 
 function App() {
 
@@ -48,6 +50,10 @@ function App() {
         selectedResource: null
     });
 
+    useEffect(() => {
+        clickSearchButton(undefined);
+    }, [])
+
     const clickSearchButton = async (formInputs: any) => {
         if (!formInputs?.id) {
             const apiResponse = await getAllTelcoResources(1, paginationData.itemPerPage);
@@ -75,6 +81,7 @@ function App() {
     const deleteResourceConfirmationHandler = async () => {
         try {
             await deleteResource(deleteModelData.selectedResource!.id);
+            await clickSearchButton(undefined);
             setDeleteModelData({isOpen: false, selectedResource: null});
             showNotification("success", "Resource Deleted Successfully");
         } catch (error) {
@@ -147,7 +154,7 @@ function App() {
             key: 'telecomProduct',
         },
         {
-            title: 'Time Schema ID',
+            title: 'Rating',
             dataIndex: 'timeSchemaId',
             key: 'timeSchemaId',
         },
@@ -270,11 +277,11 @@ function App() {
                                             columns={columns}
                                             onChange={tableOnChange}
                                             pagination={{
-                                                showSizeChanger: resourceList && resourceList.numberOfElements > 1,
+                                                showSizeChanger: resourceList && resourceList.totalElements! > 1,
                                                 pageSizeOptions: [10, 25, 50],
                                                 defaultPageSize: 10,
                                                 size: "default",
-                                                total: resourceList?.numberOfElements,
+                                                total: resourceList?.totalElements,
                                                 pageSize: paginationData.itemPerPage,
                                                 current: paginationData.currentPage
                                             }}
@@ -325,7 +332,7 @@ function App() {
                         createNewModelData.operation === "EDIT" && (
                             <>
                                 <Form.Item label="ID">{createNewModelData.selectedResource?.id}</Form.Item>
-                                <Form.Item label="Time Schema ID">{createNewModelData.selectedResource?.timeSchemaId}</Form.Item>
+                                <Form.Item label="Rating">{createNewModelData.selectedResource?.timeSchemaId}</Form.Item>
                                 <Form.Item label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
                                 <Form.Item label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
                             </>
@@ -342,21 +349,25 @@ function App() {
 
                     <Form.Item name="category" label="Category" rules={[{required: true}]}>
                         <Select placeholder="Select Telecom Product Category">
-                            <Select.Option value="CATEGORY_1">Category 1</Select.Option>
-                            <Select.Option value="CATEGORY_2">Category 2</Select.Option>
-                            <Select.Option value="CATEGORY_3">Category 3</Select.Option>
+                            {
+                                CategoryConstants.map((singleCategory) => {
+                                    return <Select.Option key={singleCategory} value={singleCategory}>{singleCategory}</Select.Option>
+                                })
+                            }
                         </Select>
                     </Form.Item>
 
                     <Form.Item name="priority" label="Priority" rules={[{required: true}]}>
                         <Select placeholder="Select Telecom Product Priority">
-                            <Select.Option value={1}>Priority 1</Select.Option>
-                            <Select.Option value={2}>Priority 2</Select.Option>
-                            <Select.Option value={3}>Priority 3</Select.Option>
+                            {
+                                PriorityConstants.map((singlePriority) => {
+                                    return <Select.Option key={singlePriority} value={singlePriority}>{singlePriority}</Select.Option>
+                                })
+                            }
                         </Select>
                     </Form.Item>
 
-                    <Form.Item name="timeSchemaId" label="Time Schema ID" rules={[{required: true}]}>
+                    <Form.Item name="timeSchemaId" label="Rating" rules={[{required: true}]}>
                         <Input
                             onKeyPress={(event) => {
                                 if (!/[0-9]/.test(event.key)) {
