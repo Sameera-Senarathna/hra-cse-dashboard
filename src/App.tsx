@@ -70,6 +70,9 @@ function App() {
                 setMetaDataList(metaDataResponse);
             } else {
                 const apiResponse = await getTelcoResourceById(formInputs.id);
+                if(apiResponse === null) {
+                    return;
+                }
                 const metaDataResponse = await getMetaData(metaDataRecodeLimit);
                 setPaginationData((prevState) => {
                     return {currentPage: 1, itemPerPage: 10}
@@ -145,7 +148,6 @@ function App() {
         } catch (error) {
 
         }
-
 
     }
 
@@ -290,7 +292,13 @@ function App() {
                                             onFinish={clickSearchButton}
                                         >
                                             <Form.Item label="ID" name="id">
-                                                <Input placeholder="Resource ID"/>
+                                                <Input
+                                                    onKeyPress={(event) => {
+                                                        if (!/[0-9]/.test(event.key)) {
+                                                            event.preventDefault();
+                                                        }
+                                                    }}
+                                                />
                                             </Form.Item>
                                             <Form.Item style={{marginInlineEnd: 8}}>
                                                 <Button
@@ -402,8 +410,10 @@ function App() {
                         createNewModelData.operation === "EDIT" && (
                             <>
                                 <Form.Item label="ID">{createNewModelData.selectedResource?.id}</Form.Item>
-                                <Form.Item label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
-                                <Form.Item label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item
+                                    label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item
+                                    label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
                             </>
                         )
                     }
@@ -444,7 +454,8 @@ function App() {
                                 if (!/[0-9]/.test(event.key)) {
                                     event.preventDefault();
                                 }
-                            }}/>
+                            }}
+                        />
                     </Form.Item>
 
                     {

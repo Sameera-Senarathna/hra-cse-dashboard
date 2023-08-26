@@ -2,6 +2,8 @@ import axiosInstance from "./axios.services";
 import ResourcesListModel, {Content} from "../models/resources-list.model";
 import backendEndpointConstants from "../constants/backend-endpoint.constants";
 import MetaDateModel from "../models/meta-date.model";
+import {AxiosError} from "axios";
+import notificationService from "./notification.service";
 
 export const getAllTelcoResources = async (page: number, size: number): Promise<ResourcesListModel> => {
     const apiResponse = await axiosInstance.get<ResourcesListModel>(
@@ -16,17 +18,26 @@ export const getAllTelcoResources = async (page: number, size: number): Promise<
 }
 
 
-export const getTelcoResourceById = async (id: string): Promise<ResourcesListModel> => {
-    const apiResponse = await axiosInstance.get<Content>(
-        backendEndpointConstants.GET_TELCO_RESOURCES_BY_ID + "/" + id,
-    )
+export const getTelcoResourceById = async (id: string): Promise<ResourcesListModel | null> => {
+    try {
+        const apiResponse = await axiosInstance.get<Content>(
+            backendEndpointConstants.GET_TELCO_RESOURCES_BY_ID + "/" + id,
+        )
 
-    const convertedResponse: ResourcesListModel = {
-        content: [apiResponse.data],
-        numberOfElements: 1
+        const convertedResponse: ResourcesListModel = {
+            content: [apiResponse.data],
+            numberOfElements: 1
+        }
+
+        return convertedResponse;
+    } catch (error: any) {
+        if(error.status === 404) {
+            notificationService("warning", "Recode Not Found");
+            return null
+        } else {
+            throw error
+        }
     }
-
-    return convertedResponse;
 
 }
 
