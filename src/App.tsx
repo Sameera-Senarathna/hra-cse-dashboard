@@ -3,7 +3,6 @@ import './App.css';
 import {Button, Col, Form, Input, Modal, Radio, Row, Select, Spin, Table, TablePaginationConfig} from "antd";
 import TelcoResourceModel from "./telco-resource.model";
 import {ColumnsType} from "antd/es/table";
-
 import {DatabaseOutlined, HomeOutlined, PlaySquareOutlined, SettingOutlined} from '@ant-design/icons';
 import ResourcesListModel, {Content} from "./models/resources-list.model";
 import {
@@ -19,6 +18,7 @@ import CategoryConstants from "./constants/Category.Constants";
 import PriorityConstants from "./constants/Priority.constants";
 import MetaDateModel from "./models/meta-date.model";
 import notificationService from "./services/notification.service";
+import {Line, Gauge} from '@ant-design/plots';
 
 function App() {
 
@@ -56,8 +56,13 @@ function App() {
 
     useEffect(() => {
         clickSearchButton(undefined);
-    }, [])
+    }, []);
 
+    const LineChartConfig = {
+        data: metaDataList,
+        xField: 'id',
+        yField: 'delay',
+    };
     const clickSearchButton = async (formInputs: any) => {
         try {
             if (!formInputs?.id) {
@@ -70,7 +75,7 @@ function App() {
                 setMetaDataList(metaDataResponse);
             } else {
                 const apiResponse = await getTelcoResourceById(formInputs.id);
-                if(apiResponse === null) {
+                if (apiResponse === null) {
                     return;
                 }
                 const metaDataResponse = await getMetaData(metaDataRecodeLimit);
@@ -370,8 +375,45 @@ function App() {
                         </Col>
                         <Col span={8} className="analytic-section">
                             <Row>
-                                <Col span="24" className="section-header">
-                                    Analytic Section
+                                <Col span="24" style={{padding: 12}}>
+                                    <h3>Analytic Section</h3>
+                                </Col>
+                                <Col span="24" style={{padding: "0 12px"}}>
+                                    <Line
+                                        {...LineChartConfig}
+                                        height={300}
+                                        yAxis={{
+                                            title: {text: "Delay (ms)"}
+                                        }}
+                                        xAxis={{
+                                            title: {text: "Request ID"}
+                                        }}
+                                    />
+                                </Col>
+                                <Col span="12" style={{padding: "12px 12px"}}>
+                                    <Gauge
+                                        height={200}
+                                        percent={metaDataList[0] ? metaDataList[0].hitRate : 0}
+                                        statistic={{
+                                            content: {
+                                                formatter: (statstic: any) => `Hit Rate: ${(statstic.percent * 100).toFixed(0)}%`,
+                                                style: {
+                                                    color: 'rgba(0,0,0,0.65)',
+                                                    fontSize: "16px"
+                                                },
+                                            },
+                                        }}
+                                        axis={{
+                                            label: {
+                                                formatter(v) {
+                                                    return Number(v) * 100;
+                                                },
+                                            }
+                                        }}
+                                        range={{
+                                            color: '#30BF78',
+                                        }}
+                                    />
                                 </Col>
                             </Row>
 

@@ -3,7 +3,7 @@ interface MetaDateModel {
     requestType: string;
     requestStatus: string;
     dateTime: string;
-    hitRate: string;
+    hitRate: number;
     delay: string;
 }
 
