@@ -31,8 +31,8 @@ export const getTelcoResourceById = async (id: string): Promise<ResourcesListMod
 
         return convertedResponse;
     } catch (error: any) {
-        if(error.status === 404) {
-            notificationService("warning", "Recode Not Found");
+        if(error.response.status === 404) {
+            notificationService("warning", "Record Not Found");
             return null
         } else {
             throw error

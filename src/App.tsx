@@ -59,7 +59,7 @@ function App() {
     }, []);
 
     const LineChartConfig = {
-        data: metaDataList,
+        data: (JSON.parse(JSON.stringify(metaDataList)) as MetaDateModel[]).reverse(),
         xField: 'id',
         yField: 'delay',
     };
@@ -76,6 +76,8 @@ function App() {
             } else {
                 const apiResponse = await getTelcoResourceById(formInputs.id);
                 if (apiResponse === null) {
+                    const metaDataResponse = await getMetaData(metaDataRecodeLimit);
+                    setMetaDataList(metaDataResponse);
                     return;
                 }
                 const metaDataResponse = await getMetaData(metaDataRecodeLimit);
@@ -378,7 +380,7 @@ function App() {
                                 <Col span="24" style={{padding: 12}}>
                                     <h3>Analytic Section</h3>
                                 </Col>
-                                <Col span="24" style={{padding: "0 12px"}}>
+                                <Col span="24" style={{padding: "12px 12px"}}>
                                     <Line
                                         {...LineChartConfig}
                                         height={300}
@@ -390,28 +392,17 @@ function App() {
                                         }}
                                     />
                                 </Col>
-                                <Col span="12" style={{padding: "12px 12px"}}>
-                                    <Gauge
-                                        height={200}
-                                        percent={metaDataList[0] ? metaDataList[0].hitRate : 0}
-                                        statistic={{
-                                            content: {
-                                                formatter: (statstic: any) => `Hit Rate: ${(statstic.percent * 100).toFixed(0)}%`,
-                                                style: {
-                                                    color: 'rgba(0,0,0,0.65)',
-                                                    fontSize: "16px"
-                                                },
-                                            },
+                                <Col span="24" style={{padding: "12px 12px"}}>
+                                    <Line
+                                        data = {(JSON.parse(JSON.stringify(metaDataList)) as MetaDateModel[]).reverse()}
+                                        xField = 'id'
+                                        yField ='hitRate'
+                                        height={300}
+                                        yAxis={{
+                                            title: {text: "Hit Rate %"}
                                         }}
-                                        axis={{
-                                            label: {
-                                                formatter(v) {
-                                                    return Number(v) * 100;
-                                                },
-                                            }
-                                        }}
-                                        range={{
-                                            color: '#30BF78',
+                                        xAxis={{
+                                            title: {text: "Request ID"}
                                         }}
                                     />
                                 </Col>
