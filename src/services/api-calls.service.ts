@@ -35,7 +35,7 @@ export const createResource = async (
         telecomProduct: string;
         category: string;
         priority: string;
-        timeSchemaId: string;
+        rating: string;
     },
     createWith: "CACHING" | "WRITE_BACK" | "DEFAULT",
     bufferSize?: string
@@ -72,7 +72,7 @@ export const updateResource = async (
         telecomProduct: string;
         category: string;
         priority: string;
-        timeSchemaId: string;
+        rating: string;
     },
     id: number
 ): Promise<"OPERATION SUCCESS"> => {

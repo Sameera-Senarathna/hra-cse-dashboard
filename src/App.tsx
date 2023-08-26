@@ -118,7 +118,7 @@ function App() {
                         category: formValue.category,
                         priority: formValue.priority,
                         telecomProduct: formValue.telecomProduct,
-                        timeSchemaId: formValue.timeSchemaId
+                        rating: formValue.rating
                     },
                     formValue.createWith,
                     formValue.bufferSize
@@ -131,7 +131,7 @@ function App() {
                         category: formValue.category,
                         priority: formValue.priority,
                         telecomProduct: formValue.telecomProduct,
-                        timeSchemaId: formValue.timeSchemaId
+                        rating: formValue.rating
                     },
                     createNewModelData.selectedResource!.id
                 )
@@ -172,8 +172,8 @@ function App() {
         },
         {
             title: 'Rating',
-            dataIndex: 'timeSchemaId',
-            key: 'timeSchemaId',
+            dataIndex: 'rating',
+            key: 'rating',
         },
         {
             title: 'Category',
@@ -201,7 +201,7 @@ function App() {
                                     category: record.category,
                                     priority: record.priority,
                                     telecomProduct: record.telecomProduct,
-                                    timeSchemaId: record.timeSchemaId
+                                    rating: record.rating
                                 })
                                 setCreateNewModelData({
                                     isOpen: true,
@@ -303,11 +303,14 @@ function App() {
                                             <Form.Item style={{marginInlineEnd: 0}}>
                                                 <Button
                                                     type="primary"
-                                                    onClick={() => setCreateNewModelData({
-                                                        isOpen: true,
-                                                        operation: "NEW",
-                                                        selectedResource: null
-                                                    })}
+                                                    onClick={() => {
+                                                        form.resetFields();
+                                                        setCreateNewModelData({
+                                                            isOpen: true,
+                                                            operation: "NEW",
+                                                            selectedResource: null
+                                                        })
+                                                    }}
                                                 >
                                                     Create New
                                                 </Button>
@@ -352,6 +355,7 @@ function App() {
                                         dataSource={metaDataList}
                                         columns={metaDataTableColumns}
                                         key="id"
+                                        pagination={false}
                                     />
                                 </Col>
                             </div>
@@ -391,17 +395,15 @@ function App() {
                         telecomProduct: createNewModelData.operation === "EDIT" ? createNewModelData.selectedResource?.telecomProduct : undefined,
                         category: createNewModelData.operation === "EDIT" ? createNewModelData.selectedResource?.category : undefined,
                         priority: createNewModelData.operation === "EDIT" ? createNewModelData.selectedResource?.priority : undefined,
+                        rating: createNewModelData.operation === "EDIT" ? createNewModelData.selectedResource?.rating : undefined,
                     }}
                 >
                     {
                         createNewModelData.operation === "EDIT" && (
                             <>
                                 <Form.Item label="ID">{createNewModelData.selectedResource?.id}</Form.Item>
-                                <Form.Item label="Rating">{createNewModelData.selectedResource?.timeSchemaId}</Form.Item>
-                                <Form.Item
-                                    label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
-                                <Form.Item
-                                    label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item label="Created Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
+                                <Form.Item label="Last Update Time">{createNewModelData.selectedResource?.createdDate}</Form.Item>
                             </>
                         )
                     }
@@ -436,7 +438,7 @@ function App() {
                         </Select>
                     </Form.Item>
 
-                    <Form.Item name="timeSchemaId" label="Rating" rules={[{required: true}]}>
+                    <Form.Item name="rating" label="Rating" rules={[{required: true}]}>
                         <Input
                             onKeyPress={(event) => {
                                 if (!/[0-9]/.test(event.key)) {

@@ -16,7 +16,7 @@ export interface Content {
     createdDate: string;
     modifiedDate: string;
     telecomProduct: string;
-    timeSchemaId: number;
+    rating: number;
     category: string;
     priority: number;
 }
