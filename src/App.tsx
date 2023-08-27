@@ -377,11 +377,17 @@ function App() {
                                 <Col span="24" className="section-header">
                                     Metadata Section
                                     <div>
-                                        <span style={{fontSize: 14, fontWeight: "normal", paddingRight: 8}}>Recode Limit:</span>
+                                        <span style={{fontSize: 14, fontWeight: "normal", paddingRight: 8}}>Record Limit:</span>
                                         <Input
                                             defaultValue={10}
                                             style={{width: 40}}
-                                            onChange={(event) => setMetaDataRecodeLimit(event.target.value)}/>
+                                            onChange={(event) => setMetaDataRecodeLimit(event.target.value)}
+                                            onKeyPress={(event) => {
+                                                if (!/[0-9]/.test(event.key)) {
+                                                    event.preventDefault();
+                                                }
+                                            }}
+                                        />
                                     </div>
                                 </Col>
 
@@ -449,6 +455,11 @@ function App() {
                                                 style={{width: 40, margin: "0 8px"}}
                                                 onChange={(event) => setLoadTestTime(event.target.value)}
                                                 defaultValue={3}
+                                                onKeyPress={(event) => {
+                                                    if (!/[0-9]/.test(event.key)) {
+                                                        event.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             <Button
                                                 onClick={() => {startLoadTest()}}
