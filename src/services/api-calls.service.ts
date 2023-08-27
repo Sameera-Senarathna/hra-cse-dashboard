@@ -156,7 +156,7 @@ export const startLoadTestWithTIme = async (testTime?: string): Promise<LoadTest
     })
 
     const loadTestHitRates: LoadTestHitRateModel[] = apiResponse.data.map((singleLoadTestResult, index) => {
-        return {loadTestId: index.toString(), hitRate: parseFloat(singleLoadTestResult[1])}
+        return {loadTestId: (index + 1).toString(), hitRate: parseFloat(singleLoadTestResult[1])}
     })
 
     return {delays: loadTestDelays, hitRates: loadTestHitRates};
