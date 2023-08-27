@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {Button, Col, Form, Input, Modal, Radio, Row, Select, Spin, Table, TablePaginationConfig} from "antd";
+import {Button, Col, Empty, Form, Input, Modal, Radio, Row, Select, Spin, Table, TablePaginationConfig} from "antd";
 import TelcoResourceModel from "./telco-resource.model";
 import {ColumnsType} from "antd/es/table";
 import {DatabaseOutlined, HomeOutlined, PlaySquareOutlined, SettingOutlined} from '@ant-design/icons';
@@ -9,7 +9,7 @@ import {
     createResource,
     deleteResource,
     getAllTelcoResources, getMetaData,
-    getTelcoResourceById,
+    getTelcoResourceById, LoadTestResults, startLoadTestWithTIme,
     updateResource
 } from "./services/api-calls.service";
 import {useWatch} from "antd/es/form/Form";
@@ -18,13 +18,17 @@ import CategoryConstants from "./constants/Category.Constants";
 import PriorityConstants from "./constants/Priority.constants";
 import MetaDateModel from "./models/meta-date.model";
 import notificationService from "./services/notification.service";
-import {Line, Gauge} from '@ant-design/plots';
+import {Line, Column} from '@ant-design/plots';
 
 function App() {
 
     const [form] = Form.useForm();
     const createdWithValue = useWatch("createWith", form);
-    const [metaDataRecodeLimit, setMetaDataRecodeLimit] = useState("10")
+    const [metaDataRecodeLimit, setMetaDataRecodeLimit] = useState("10");
+
+    const [loadTestTime, setLoadTestTime] = useState<string>("3");
+    const [isLoadTestInProgess, setIsLoadTestInProgess] = useState<boolean>(false);
+    const [loadTestResult, setLoadTestResult] = useState<LoadTestResults>();
 
     const [resourceList, setResourceList] = useState<ResourcesListModel>();
     const [metaDataList, setMetaDataList] = useState<MetaDateModel[]>([]);
@@ -63,6 +67,16 @@ function App() {
         xField: 'id',
         yField: 'delay',
     };
+
+    const startLoadTest = async () => {
+        setIsLoadTestInProgess(true);
+        setLoadTestResult(undefined);
+        const  loadTestResult = await startLoadTestWithTIme(loadTestTime);
+        setLoadTestResult(loadTestResult);
+        setIsLoadTestInProgess(false);
+        await clickSearchButton(undefined);
+    }
+
     const clickSearchButton = async (formInputs: any) => {
         try {
             if (!formInputs?.id) {
@@ -163,6 +177,7 @@ function App() {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
+            width: 40
         },
         {
             title: 'Created Date',
@@ -183,6 +198,7 @@ function App() {
             title: 'Rating',
             dataIndex: 'rating',
             key: 'rating',
+            width: 60,
         },
         {
             title: 'Category',
@@ -193,12 +209,14 @@ function App() {
             title: 'Priority',
             dataIndex: 'priority',
             key: 'priority',
+            width: 80,
         },
         {
             title: 'Actions',
             dataIndex: 'action',
             key: 'action',
             align: "center",
+            width: 160,
             render: (_, record, index) => {
                 return (
                     <div style={{textAlign: "center"}}>
@@ -287,7 +305,7 @@ function App() {
                 <div className="app-content">
                     <Row>
                         <Col span={16} className="crud-section">
-                            <div style={{paddingLeft: 12, paddingRight: 12}}>
+                            <div style={{paddingLeft: 12, paddingRight: 12, marginBottom: 8}}>
                                 <Row>
                                     <Col span="24" className="section-header">
                                         CRUD Section
@@ -347,6 +365,9 @@ function App() {
                                                 pageSize: paginationData.itemPerPage,
                                                 current: paginationData.currentPage
                                             }}
+                                            scroll={{
+                                                y: 200
+                                            }}
                                             key="id"
                                         />
                                     </Col>
@@ -356,12 +377,12 @@ function App() {
                                 <Col span="24" className="section-header">
                                     Metadata Section
                                     <div>
+                                        <span style={{fontSize: 14, fontWeight: "normal", paddingRight: 8}}>Recode Limit:</span>
                                         <Input
                                             defaultValue={10}
                                             style={{width: 40}}
                                             onChange={(event) => setMetaDataRecodeLimit(event.target.value)}/>
                                     </div>
-
                                 </Col>
 
                                 <Col span="24" className="show-date-section">
@@ -371,6 +392,9 @@ function App() {
                                         columns={metaDataTableColumns}
                                         key="id"
                                         pagination={false}
+                                        scroll={{
+                                            y: 200
+                                        }}
                                     />
                                 </Col>
                             </div>
@@ -383,7 +407,7 @@ function App() {
                                 <Col span="24" style={{padding: "12px 12px"}}>
                                     <Line
                                         {...LineChartConfig}
-                                        height={300}
+                                        height={120}
                                         yAxis={{
                                             title: {text: "Delay (ms)"}
                                         }}
@@ -394,10 +418,10 @@ function App() {
                                 </Col>
                                 <Col span="24" style={{padding: "12px 12px"}}>
                                     <Line
-                                        data = {(JSON.parse(JSON.stringify(metaDataList)) as MetaDateModel[]).reverse()}
-                                        xField = 'id'
-                                        yField ='hitRate'
-                                        height={300}
+                                        data={(JSON.parse(JSON.stringify(metaDataList)) as MetaDateModel[]).reverse()}
+                                        xField='id'
+                                        yField='hitRate'
+                                        height={120}
                                         yAxis={{
                                             title: {text: "Hit Rate %"}
                                         }}
@@ -406,8 +430,92 @@ function App() {
                                         }}
                                     />
                                 </Col>
-                            </Row>
+                                <Col span={24}>
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent: "space-between",
+                                            padding: "8px",
+                                            alignItems: 'center',
+                                            background: 'lightgray',
+                                            margin: "0 12px"
+                                        }}
+                                    >
 
+                                        <span style={{fontWeight: "bold"}}> Load Testing</span>
+                                        <div>
+                                            <span>Test Time:</span>
+                                            <Input
+                                                style={{width: 40, margin: "0 8px"}}
+                                                onChange={(event) => setLoadTestTime(event.target.value)}
+                                                defaultValue={3}
+                                            />
+                                            <Button
+                                                onClick={() => {startLoadTest()}}
+                                            >
+                                                {
+                                                    isLoadTestInProgess && <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                                        <div className="lds-dual-ring"></div>
+                                                        <span style={{paddingLeft: 8}}>Load Test In-Progress</span>
+                                                    </div>
+                                                }
+                                                {
+                                                    !isLoadTestInProgess && "Run Load Test"
+                                                }
+                                            </Button>
+                                        </div>
+
+                                    </div>
+                                </Col>
+                                {
+                                    !loadTestResult &&
+                                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200, width: "100%"}}>
+                                        <Empty description="No Load Test Data"/>
+                                    </div>
+                                }
+                                {
+                                    loadTestResult?.delays &&
+                                    <Col span={24} style={{padding: "12px 12px"}}>
+                                        <Column
+                                            data={loadTestResult.delays}
+                                            height={130}
+                                            xField="loadTestId"
+                                            yField="delay"
+                                            xAxis={{
+                                                title: {
+                                                    text: "Load Test ID"
+                                                }
+                                            }}
+                                            yAxis={{
+                                                title: {
+                                                    text: "Delay (ms)"
+                                                }
+                                            }}
+                                        />
+                                    </Col>
+                                }
+                                {
+                                    loadTestResult?.hitRates &&
+                                    <Col span={24} style={{padding: "12px 12px"}}>
+                                        <Column
+                                            data={loadTestResult.hitRates}
+                                            height={130}
+                                            xField="loadTestId"
+                                            yField="hitRate"
+                                            xAxis={{
+                                                title: {
+                                                    text: "Load Test ID"
+                                                }
+                                            }}
+                                            yAxis={{
+                                                title: {
+                                                    text: "HitRate %"
+                                                }
+                                            }}
+                                        />
+                                    </Col>
+                                }
+                            </Row>
                         </Col>
                     </Row>
                 </div>

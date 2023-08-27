@@ -125,3 +125,40 @@ export const getMetaData = async (
     return apiResponse.data;
 
 }
+
+export interface LoadTestDelayModel {
+    loadTestId: string;
+    delay: number;
+}
+export interface LoadTestHitRateModel {
+    loadTestId: string;
+    hitRate: number;
+}
+
+export interface LoadTestResults {
+    delays: LoadTestDelayModel[];
+    hitRates: LoadTestHitRateModel[]
+}
+
+export const startLoadTestWithTIme = async (testTime?: string): Promise<LoadTestResults> => {
+
+    const apiResponse = await axiosInstance.get<{[0]: string, [1]: string}[]>(
+        backendEndpointConstants.LOAD_TEST,
+        {
+            params: {
+                "test-time": testTime ?? "3"
+            }
+        }
+    )
+
+    const loadTestDelays: LoadTestDelayModel[] = apiResponse.data.map((singleLoadTestResult, index) => {
+        return {loadTestId: (index+ 1).toString(), delay: parseFloat(singleLoadTestResult[0])}
+    })
+
+    const loadTestHitRates: LoadTestHitRateModel[] = apiResponse.data.map((singleLoadTestResult, index) => {
+        return {loadTestId: index.toString(), hitRate: parseFloat(singleLoadTestResult[1])}
+    })
+
+    return {delays: loadTestDelays, hitRates: loadTestHitRates};
+
+}
