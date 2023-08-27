@@ -7,7 +7,8 @@ const BackendEndpointConstants = {
     UPDATE_RESOURCE: "/telcoproductcatalog/updatetelcoresource",
     DELETE_RESOURCE: "/telcoproductcatalog/deletetelcoresource",
     META_DATA: "/telcoproductcatalog/getmetadata",
-    LOAD_TEST: "/telcoproductcatalog/getloadtestresults"
+    LOAD_TEST: "/telcoproductcatalog/getloadtestresults",
+    GET_CACHED_DATA: "/telcoproductcatalog/getallcacherecords",
 }
 
 export default  BackendEndpointConstants

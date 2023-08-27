@@ -1,6 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {Button, Col, Empty, Form, Input, Modal, Radio, Row, Select, Spin, Table, TablePaginationConfig} from "antd";
+import {
+    Button,
+    Col,
+    Empty,
+    Form,
+    Input,
+    Modal,
+    Radio,
+    Row,
+    Select,
+    Spin,
+    Table,
+    TablePaginationConfig,
+    Tooltip
+} from "antd";
 import TelcoResourceModel from "./telco-resource.model";
 import {ColumnsType} from "antd/es/table";
 import {DatabaseOutlined, HomeOutlined, PlaySquareOutlined, SettingOutlined} from '@ant-design/icons';
@@ -19,6 +33,7 @@ import PriorityConstants from "./constants/Priority.constants";
 import MetaDateModel from "./models/meta-date.model";
 import notificationService from "./services/notification.service";
 import {Line, Column} from '@ant-design/plots';
+import CachedRecords from "./components/CachedRecords";
 
 function App() {
 
@@ -28,7 +43,9 @@ function App() {
 
     const [loadTestTime, setLoadTestTime] = useState<string>("3");
     const [isLoadTestInProgess, setIsLoadTestInProgess] = useState<boolean>(false);
+
     const [loadTestResult, setLoadTestResult] = useState<LoadTestResults>();
+    const [isCachedDataDrawerOepn, setIsCachedDataDrawerOepn] = useState<boolean>(false);
 
     const [resourceList, setResourceList] = useState<ResourcesListModel>();
     const [metaDataList, setMetaDataList] = useState<MetaDateModel[]>([]);
@@ -71,7 +88,7 @@ function App() {
     const startLoadTest = async () => {
         setIsLoadTestInProgess(true);
         setLoadTestResult(undefined);
-        const  loadTestResult = await startLoadTestWithTIme(loadTestTime);
+        const loadTestResult = await startLoadTestWithTIme(loadTestTime);
         setLoadTestResult(loadTestResult);
         setIsLoadTestInProgess(false);
         await clickSearchButton(undefined);
@@ -204,6 +221,7 @@ function App() {
             title: 'Category',
             dataIndex: 'category',
             key: 'category',
+            width: 100,
         },
         {
             title: 'Priority',
@@ -288,20 +306,23 @@ function App() {
         <>
 
             <div className="app-container">
-                {/*<div className="app-side-menu">*/}
-                {/*    <div className="menu-item">*/}
-                {/*        <HomeOutlined style={{fontSize: 36}}/>*/}
-                {/*    </div>*/}
-                {/*    <div className="menu-item">*/}
-                {/*        <PlaySquareOutlined style={{fontSize: 36}}/>*/}
-                {/*    </div>*/}
-                {/*    <div className="menu-item">*/}
-                {/*        <DatabaseOutlined style={{fontSize: 36}}/>*/}
-                {/*    </div>*/}
-                {/*    <div className="menu-item">*/}
-                {/*        <SettingOutlined style={{fontSize: 36}}/>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+                <div className="app-side-menu">
+                    <Tooltip title="View Cached Data" placement="right">
+                        <div className="menu-item" onClick={() => setIsCachedDataDrawerOepn(true)}>
+                            <DatabaseOutlined style={{fontSize: 36}}/>
+                        </div>
+                    </Tooltip>
+                    {/*<div className="menu-item">*/}
+                    {/*    <HomeOutlined style={{fontSize: 36}}/>*/}
+                    {/*</div>*/}
+                    {/*<div className="menu-item">*/}
+                    {/*    <PlaySquareOutlined style={{fontSize: 36}}/>*/}
+                    {/*</div>*/}
+
+                    {/*<div className="menu-item">*/}
+                    {/*    <SettingOutlined style={{fontSize: 36}}/>*/}
+                    {/*</div>*/}
+                </div>
                 <div className="app-content">
                     <Row>
                         <Col span={16} className="crud-section">
@@ -462,10 +483,16 @@ function App() {
                                                 }}
                                             />
                                             <Button
-                                                onClick={() => {startLoadTest()}}
+                                                onClick={() => {
+                                                    startLoadTest()
+                                                }}
                                             >
                                                 {
-                                                    isLoadTestInProgess && <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                                    isLoadTestInProgess && <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}>
                                                         <div className="lds-dual-ring"></div>
                                                         <span style={{paddingLeft: 8}}>Load Test In-Progress</span>
                                                     </div>
@@ -480,7 +507,13 @@ function App() {
                                 </Col>
                                 {
                                     !loadTestResult &&
-                                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200, width: "100%"}}>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        height: 200,
+                                        width: "100%"
+                                    }}>
                                         <Empty description="No Load Test Data"/>
                                     </div>
                                 }
@@ -669,6 +702,11 @@ function App() {
                     {deleteModelData.selectedResource?.priority}
                 </p>
             </Modal>
+
+            {
+                isCachedDataDrawerOepn &&
+                <CachedRecords isDrawerOpen={isCachedDataDrawerOepn} setIsDrawerOpen={setIsCachedDataDrawerOepn}/>
+            }
 
         </>
     );

@@ -162,3 +162,13 @@ export const startLoadTestWithTIme = async (testTime?: string): Promise<LoadTest
     return {delays: loadTestDelays, hitRates: loadTestHitRates};
 
 }
+
+export const getAllCachedData = async (): Promise<Content[]> => {
+
+    const apiResponse = await axiosInstance.get<Content[]>(
+        backendEndpointConstants.GET_CACHED_DATA,
+    )
+
+    return apiResponse.data;
+
+}
