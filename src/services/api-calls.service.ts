@@ -172,3 +172,23 @@ export const getAllCachedData = async (): Promise<Content[]> => {
     return apiResponse.data;
 
 }
+
+export const getCpuUsage = async (): Promise<number[]> => {
+
+    const apiResponse = await axiosInstance.get<{measurements: {value: number}[]}>(
+        backendEndpointConstants.GET_CPU_USAGE,
+    )
+
+    return apiResponse.data.measurements.map((singleMeasurement) => singleMeasurement.value);
+
+}
+
+export const getMemoryUsage = async (): Promise<number[]> => {
+
+    const apiResponse = await axiosInstance.get<{measurements: {value: number}[]}>(
+        backendEndpointConstants.GET_MEMORY_USAGE,
+    )
+
+    return apiResponse.data.measurements.map((singleMeasurement) => singleMeasurement.value);
+
+}

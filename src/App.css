@@ -3,7 +3,7 @@
 }
 
 .app-side-menu {
-    background-color: #023047;
+    background-color: #2b2e4a;
     width: 80px;
     height: 100vh;
 }
@@ -13,13 +13,13 @@
 }
 
 .crud-section {
-    background-color: lightgray;
+    background-color:#898F9C;
     min-height: 100vh;
     padding-bottom: 8px;
 }
 
 .analytic-section {
-    background-color: #8ECAE6;
+    background-color: #2b2e4a;
 }
 
 .section-header {

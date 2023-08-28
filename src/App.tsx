@@ -12,7 +12,7 @@ import {
     Select,
     Spin,
     Table,
-    TablePaginationConfig,
+    TablePaginationConfig, Tag,
     Tooltip
 } from "antd";
 import TelcoResourceModel from "./telco-resource.model";
@@ -34,6 +34,7 @@ import MetaDateModel from "./models/meta-date.model";
 import notificationService from "./services/notification.service";
 import {Line, Column} from '@ant-design/plots';
 import CachedRecords from "./components/CachedRecords";
+import CpuAndMemoryUsage from "./components/CpuAndMemoryUsage";
 
 function App() {
 
@@ -283,10 +284,32 @@ function App() {
         {
             title: 'Request Type',
             dataIndex: 'requestType',
+            render: (value, record, index) => {
+                if (value.toUpperCase() === "GET") {
+                    return <Tag color="green">GET</Tag>
+                } else if (value.toUpperCase() === "POST") {
+                    return <Tag color="blue">POST</Tag>
+                } else if (value.toUpperCase() === "PUT") {
+                    return <Tag color="yellow">PUT</Tag>
+                } else if (value.toUpperCase() === "DELETE") {
+                    return <Tag color="red">DELETE</Tag>
+                } else {
+                    return value;
+                }
+            }
         },
         {
             title: 'Request Status',
             dataIndex: 'requestStatus',
+            render: (value, record, index) => {
+                if (value.toUpperCase() === "SUCCESS") {
+                    return <Tag color="green">SUCCESS</Tag>
+                } else if (value.toUpperCase() === "FAILED") {
+                    return <Tag color="red">Failed</Tag>
+                } else {
+                    return value;
+                }
+            }
         },
         {
             title: 'Date Time',
@@ -428,8 +451,8 @@ function App() {
                         </Col>
                         <Col span={8} className="analytic-section">
                             <Row>
-                                <Col span="24" style={{padding: 12}}>
-                                    <h3>Analytic Section</h3>
+                                <Col span="24" style={{padding: 12, display: 'flex'}}>
+                                    <CpuAndMemoryUsage/>
                                 </Col>
                                 <Col span="24" style={{padding: "12px 12px"}}>
                                     <Line

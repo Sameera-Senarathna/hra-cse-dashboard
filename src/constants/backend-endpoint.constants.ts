@@ -9,6 +9,8 @@ const BackendEndpointConstants = {
     META_DATA: "/telcoproductcatalog/getmetadata",
     LOAD_TEST: "/telcoproductcatalog/getloadtestresults",
     GET_CACHED_DATA: "/telcoproductcatalog/getallcacherecords",
+    GET_CPU_USAGE: "/actuator/metrics/process.cpu.usage",
+    GET_MEMORY_USAGE: "/actuator/metrics/jvm.memory.used",
 }
 
 export default  BackendEndpointConstants
