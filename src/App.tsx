@@ -406,7 +406,7 @@ function App() {
                                             </Form.Item>
                                         </Form>
                                     </Col>
-                                    <Col span="24" className="show-date-section">
+                                    <Col span="24" className="show-date-section" style={{height: 360}}>
                                         <Table
                                             size="small"
                                             dataSource={resourceList?.content}
