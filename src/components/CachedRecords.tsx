@@ -33,11 +33,13 @@ const CachedRecords: FC<CachedRecordsProps> = ({isDrawerOpen, setIsDrawerOpen}) 
             title: 'Created Date',
             dataIndex: 'createdDate',
             key: 'createdDate',
+            width: 160
         },
         {
             title: 'Modified Date',
             dataIndex: 'modifiedDate',
             key: 'modifiedDate',
+            width: 160
         },
         {
             title: 'Telecom Product',
