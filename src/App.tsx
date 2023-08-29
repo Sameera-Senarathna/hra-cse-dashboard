@@ -332,7 +332,7 @@ function App() {
             <div className="app-container">
                 <div className="app-side-menu">
                     <Tooltip title="View Cached Data" placement="right">
-                        <div className="menu-item" onClick={() => setIsCachedDataDrawerOepn(true)}>
+                        <div className="menu-item" onClick={() => setIsCachedDataDrawerOepn(true)} style={{marginTop: 60}}>
                             <DatabaseOutlined style={{fontSize: 36}}/>
                         </div>
                     </Tooltip>
