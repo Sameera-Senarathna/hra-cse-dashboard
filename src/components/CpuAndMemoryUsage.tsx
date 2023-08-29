@@ -2,7 +2,7 @@ import {FC, useEffect, useState} from "react";
 import {Gauge} from '@ant-design/plots';
 import {getCpuUsage, getMemoryUsage} from "../services/api-calls.service";
 import notificationService from "../services/notification.service";
-import {Tag} from "antd";
+import {Col, Row, Tag} from "antd";
 
 const ticks = [0, 1 / 3, 2 / 3, 1];
 const color = ['#30BF78', '#FAAD14', '#F4664A'];
@@ -45,7 +45,7 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
 
     // @ts-ignore
     const config: any = {
-        percent: 0.3,
+        percent: cpuUsage[0],
         range: {
             ticks: [0, 1],
             color: ['l(0) 0:#30BF78 0.5:#FAAD14 1:#F4664A'],
@@ -65,7 +65,7 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
         axis: {
             label: {
                 formatter(v: any) {
-                    return Number(v) * 100;
+                    return Math.ceil((Number(v) * 100) * 1000) / 1000;
                 },
             },
             subTickLine: {
@@ -88,26 +88,49 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
         },
     };
 
-    // @ts-ignore
-    // return <Gauge {...config} />
-
     return (
-        <div style={{display: 'flex'}}>
-            <div style={{marginRight: 8}}>
-                <Tag>
-                    <span style={{fontWeight: 'bold', fontSize: 16}}>CPU:</span>
-                    <span style={{fontWeight: 'bold', fontSize: 16}}> {cpuUsage[0] * 100}%</span>
-                </Tag>
-
+        <div style={{display: 'flex', justifyContent: "center", width: "100%"}}>
+            <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: 20, lineHeight: "20px", marginBottom: "-12px"}}>CPU Usage</div>
+                <Gauge {...config} width={200} height={200}/>
             </div>
-            <div>
-                <Tag>
-                    <span style={{fontWeight: 'bold', fontSize: 16}}>Memory:</span>
-                    <span style={{fontWeight: 'bold', fontSize: 16}}> {memoryUsage[0]}</span>
-                </Tag>
+            <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: 20, lineHeight: "20px"}}>Memory Usage</div>
+                <div style={{
+                    display: "flex",
+                    height: 150,
+                    width: 250,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <Tag style={{fontSize: 20, padding: 8}}>
+                        {memoryUsage[0]}
+                        <span style={{fontWeight: 'bold'}}> Bytes</span>
+                    </Tag>
+
+                </div>
             </div>
         </div>
     )
+
+    // return (
+    //     <div style={{display: 'flex'}}>
+    //         <div style={{marginRight: 8}}>
+    //             <Tag>
+    //                 <span style={{fontWeight: 'bold', fontSize: 16}}>CPU:</span>
+    //                 <span style={{fontWeight: 'bold', fontSize: 16}}> {cpuUsage[0] * 100}%</span>
+    //             </Tag>
+    //
+    //         </div>
+    //         <div>
+    //             <Tag>
+    //                 <span style={{fontWeight: 'bold', fontSize: 16}}>Memory:</span>
+    //                 <span style={{fontWeight: 'bold', fontSize: 16}}> {memoryUsage[0]}</span>
+    //             </Tag>
+    //         </div>
+    //     </div>
+    // )
+
 }
 
 

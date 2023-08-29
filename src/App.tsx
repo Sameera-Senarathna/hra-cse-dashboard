@@ -349,16 +349,27 @@ function App() {
                 <div className="app-content">
                     <Row>
                         <Col span={16} className="crud-section">
+                            <div
+                                style={{
+                                    fontSize: 32,
+                                    fontWeight: "bold",
+                                    color: "white",
+                                    lineHeight: "60px",
+                                    background: "#2b2e4a",
+                                    padding: "0px 16px",
+                                    marginBottom: "12px"
+                                }}
+                            >
+                                HRA CSE Dashboard
+                            </div>
                             <div style={{paddingLeft: 12, paddingRight: 12, marginBottom: 8}}>
                                 <Row>
-                                    <Col span="24" className="section-header">
-                                        CRUD Section
-                                    </Col>
                                     <Col span="24" className="search-input-form">
                                         <Form
                                             style={{justifyContent: "end"}}
                                             layout="inline"
                                             onFinish={clickSearchButton}
+                                            size="small"
                                         >
                                             <Form.Item label="ID" name="id">
                                                 <Input
@@ -410,7 +421,7 @@ function App() {
                                                 current: paginationData.currentPage
                                             }}
                                             scroll={{
-                                                y: 200
+                                                y: 250
                                             }}
                                             key="id"
                                         />
@@ -419,10 +430,11 @@ function App() {
                             </div>
                             <div style={{paddingLeft: 12, paddingRight: 12}}>
                                 <Col span="24" className="section-header">
-                                    Metadata Section
+                                    Metadata
                                     <div>
                                         <span style={{fontSize: 14, fontWeight: "normal", paddingRight: 8}}>Record Limit:</span>
                                         <Input
+                                            size="small"
                                             defaultValue={10}
                                             style={{width: 40}}
                                             onChange={(event) => setMetaDataRecodeLimit(event.target.value)}
@@ -443,7 +455,7 @@ function App() {
                                         key="id"
                                         pagination={false}
                                         scroll={{
-                                            y: 200
+                                            y: 330
                                         }}
                                     />
                                 </Col>
@@ -454,7 +466,8 @@ function App() {
                                 <Col span="24" style={{padding: 12, display: 'flex'}}>
                                     <CpuAndMemoryUsage/>
                                 </Col>
-                                <Col span="24" style={{padding: "12px 12px"}}>
+                                <Col span="24" style={{padding: "0px 12px"}}>
+                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px"}}>Latency</div>
                                     <Line
                                         {...LineChartConfig}
                                         height={120}
@@ -467,6 +480,7 @@ function App() {
                                     />
                                 </Col>
                                 <Col span="24" style={{padding: "12px 12px"}}>
+                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px"}}>Hit Rate</div>
                                     <Line
                                         data={(JSON.parse(JSON.stringify(metaDataList)) as MetaDateModel[]).reverse()}
                                         xField='id'
@@ -491,7 +505,6 @@ function App() {
                                             margin: "0 12px"
                                         }}
                                     >
-
                                         <span style={{fontWeight: "bold"}}> Load Testing</span>
                                         <div>
                                             <span>Test Time:</span>
@@ -555,7 +568,7 @@ function App() {
                                             }}
                                             yAxis={{
                                                 title: {
-                                                    text: "Delay (ms)"
+                                                    text: "Throughput (1/s)"
                                                 }
                                             }}
                                         />
@@ -576,7 +589,7 @@ function App() {
                                             }}
                                             yAxis={{
                                                 title: {
-                                                    text: "HitRate %"
+                                                    text: "Avg Delay (ms)"
                                                 }
                                             }}
                                         />
