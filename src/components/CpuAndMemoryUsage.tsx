@@ -75,7 +75,7 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
         statistic: {
             title: {
                 formatter: ({percent}: any) => {
-                    return (Math.ceil((Number(percent) * 100) * 1000) / 1000) + " %";
+                    return (Math.ceil((Number(percent) * 100) * 1000000) / 1000000) + " %";
                 },
                 style: ({percent}: any) => {
                     return {
