@@ -65,7 +65,7 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
         axis: {
             label: {
                 formatter(v: any) {
-                    return Number(v) * 1000;
+                    return Number(v) * 100;
                 },
             },
             subTickLine: {
