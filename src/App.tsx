@@ -201,11 +201,13 @@ function App() {
             title: 'Created Date',
             dataIndex: 'createdDate',
             key: 'createdDate',
+            width: 160
         },
         {
             title: 'Modified Date',
             dataIndex: 'modifiedDate',
             key: 'modifiedDate',
+            width: 160
         },
         {
             title: 'Telecom Product',
@@ -221,8 +223,7 @@ function App() {
         {
             title: 'Category',
             dataIndex: 'category',
-            key: 'category',
-            width: 100,
+            key: 'category'
         },
         {
             title: 'Priority',
@@ -277,10 +278,10 @@ function App() {
     ];
 
     const metaDataTableColumns: ColumnsType<MetaDateModel> = [
-        {
-            title: 'ID',
-            dataIndex: 'id',
-        },
+        // {
+        //     title: 'ID',
+        //     dataIndex: 'id',
+        // },
         {
             title: 'Request Type',
             dataIndex: 'requestType',
@@ -362,7 +363,7 @@ function App() {
                             >
                                 HRA CSE Dashboard
                             </div>
-                            <div style={{paddingLeft: 12, paddingRight: 12, marginBottom: 8}}>
+                            <div style={{paddingLeft: 12, paddingRight: 20, marginBottom: 8}}>
                                 <Row>
                                     <Col span="24" className="search-input-form">
                                         <Form
@@ -428,7 +429,7 @@ function App() {
                                     </Col>
                                 </Row>
                             </div>
-                            <div style={{paddingLeft: 12, paddingRight: 12}}>
+                            <div style={{paddingLeft: 12, paddingRight: 20}}>
                                 <Col span="24" className="section-header">
                                     Metadata
                                     <div>
@@ -467,7 +468,7 @@ function App() {
                                     <CpuAndMemoryUsage/>
                                 </Col>
                                 <Col span="24" style={{padding: "0px 12px"}}>
-                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px"}}>Latency</div>
+                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px", fontWeight: 'bold'}}>Latency</div>
                                     <Line
                                         {...LineChartConfig}
                                         height={120}
@@ -480,7 +481,7 @@ function App() {
                                     />
                                 </Col>
                                 <Col span="24" style={{padding: "12px 12px"}}>
-                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px"}}>Hit Rate</div>
+                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px", fontWeight: 'bold'}}>Hit Rate</div>
                                     <Line
                                         data={(JSON.parse(JSON.stringify(metaDataList)) as MetaDateModel[]).reverse()}
                                         xField='id'

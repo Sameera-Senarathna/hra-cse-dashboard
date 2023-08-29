@@ -65,7 +65,7 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
         axis: {
             label: {
                 formatter(v: any) {
-                    return Math.ceil((Number(v) * 100) * 1000) / 1000;
+                    return Number(v) * 1000;
                 },
             },
             subTickLine: {
@@ -75,7 +75,7 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
         statistic: {
             title: {
                 formatter: ({percent}: any) => {
-                    return percent * 100 + " %";
+                    return (Math.ceil((Number(percent) * 100) * 1000) / 1000) + " %";
                 },
                 style: ({percent}: any) => {
                     return {
@@ -91,11 +91,11 @@ const CpuAndMemoryUsage: FC<CpuAndMemoryUsageProps> = () => {
     return (
         <div style={{display: 'flex', justifyContent: "center", width: "100%"}}>
             <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: 20, lineHeight: "20px", marginBottom: "-12px"}}>CPU Usage</div>
+                <div style={{fontSize: 20, lineHeight: "20px", marginBottom: "-12px", fontWeight: 'bold'}}>CPU Usage</div>
                 <Gauge {...config} width={200} height={200}/>
             </div>
             <div style={{textAlign: 'center'}}>
-                <div style={{fontSize: 20, lineHeight: "20px"}}>Memory Usage</div>
+                <div style={{fontSize: 20, lineHeight: "20px", fontWeight: 'bold'}}>Memory Usage</div>
                 <div style={{
                     display: "flex",
                     height: 150,
