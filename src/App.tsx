@@ -332,7 +332,8 @@ function App() {
             <div className="app-container">
                 <div className="app-side-menu">
                     <Tooltip title="View Cached Data" placement="right">
-                        <div className="menu-item" onClick={() => setIsCachedDataDrawerOepn(true)} style={{marginTop: 60}}>
+                        <div className="menu-item" onClick={() => setIsCachedDataDrawerOepn(true)}
+                             style={{marginTop: 60}}>
                             <DatabaseOutlined style={{fontSize: 36}}/>
                         </div>
                     </Tooltip>
@@ -468,7 +469,13 @@ function App() {
                                     <CpuAndMemoryUsage/>
                                 </Col>
                                 <Col span="24" style={{padding: "0px 12px"}}>
-                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px", fontWeight: 'bold'}}>Latency</div>
+                                    <div style={{
+                                        fontSize: 20,
+                                        lineHeight: "20px",
+                                        paddingBottom: "16px",
+                                        fontWeight: 'bold'
+                                    }}>Latency
+                                    </div>
                                     <Line
                                         {...LineChartConfig}
                                         height={120}
@@ -481,7 +488,13 @@ function App() {
                                     />
                                 </Col>
                                 <Col span="24" style={{padding: "12px 12px"}}>
-                                    <div style={{fontSize: 20, lineHeight: "20px", paddingBottom: "16px", fontWeight: 'bold'}}>Hit Rate</div>
+                                    <div style={{
+                                        fontSize: 20,
+                                        lineHeight: "20px",
+                                        paddingBottom: "16px",
+                                        fontWeight: 'bold'
+                                    }}>Hit Rate
+                                    </div>
                                     <Line
                                         data={(JSON.parse(JSON.stringify(metaDataList)) as MetaDateModel[]).reverse()}
                                         xField='id'
@@ -572,6 +585,11 @@ function App() {
                                                     text: "Throughput (1/s)"
                                                 }
                                             }}
+                                            meta={{
+                                                delay: {
+                                                    alias: 'Throughput',
+                                                },
+                                            }}
                                         />
                                     </Col>
                                 }
@@ -591,6 +609,12 @@ function App() {
                                             yAxis={{
                                                 title: {
                                                     text: "Avg Delay (ms)"
+                                                }
+                                            }}
+                                            meta={{
+                                                hitRate: {
+                                                    alias: 'Avg Delay',
+                                                    formatter: (value) => value + " ms"
                                                 }
                                             }}
                                         />
